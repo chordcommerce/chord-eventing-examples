@@ -14,6 +14,7 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import {ChordAnalytics} from './components/ChordAnalytics';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -85,6 +86,14 @@ export async function loader(args) {
       // localize the privacy banner
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
+    },
+    chord: {
+      domain: env.PUBLIC_STORE_DOMAIN,
+      omsId: env.PUBLIC_CHORD_OMS_ID,
+      storeId: env.PUBLIC_CHORD_STORE_ID,
+      tenantId: env.PUBLIC_CHORD_TENANT_ID,
+      cdpDomain: env.PUBLIC_CHORD_CDP_DOMAIN,
+      cdpWriteKey: env.PUBLIC_CHORD_CDP_WRITE_KEY,
     },
   };
 }
@@ -164,6 +173,18 @@ export function Layout({children}) {
             shop={data.shop}
             consent={data.consent}
           >
+            {data.chord && (
+              <ChordAnalytics
+                currency="USD"
+                domain={data.chord.domain}
+                locale="en-US"
+                omsId={data.chord.omsId}
+                storeId={data.chord.storeId}
+                tenantId={data.chord.tenantId}
+                cdpDomain={data.chord.cdpDomain}
+                cdpWriteKey={data.chord.cdpWriteKey}
+              />
+            )}
             <PageLayout {...data}>{children}</PageLayout>
           </Analytics.Provider>
         ) : (
