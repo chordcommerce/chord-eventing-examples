@@ -110,6 +110,43 @@ export function ChordAnalytics({
         })),
       });
     });
+
+    subscribe('custom_promo_code_denied', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponDenied({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+        reason: customData?.reason,
+      });
+    });
+
+    subscribe('custom_promo_code_applied', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponApplied({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+      });
+    });
+
+    subscribe('custom_promo_code_entered', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponEntered({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+      });
+    });
+
+    subscribe('custom_promo_code_removed', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponRemoved({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+      });
+    });
   }, []);
 
   return null;

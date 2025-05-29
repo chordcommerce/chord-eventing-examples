@@ -1,5 +1,5 @@
-import {CartForm, Money} from '@shopify/hydrogen';
-import {useRef} from 'react';
+import {CartForm, Money, useAnalytics} from '@shopify/hydrogen';
+import {useRef, useState, useEffect} from 'react';
 
 /**
  * @param {CartSummaryProps}
@@ -49,10 +49,40 @@ function CartCheckoutActions({checkoutUrl}) {
  * }}
  */
 function CartDiscounts({discountCodes}) {
+  const {publish, cart: analyticsCart} = useAnalytics();
+  const [codeTyped, setCodeTyped] = useState('');
+  const [lastSubmittedCode, setLastSubmittedCode] = useState('');
+
   const codes =
     discountCodes
       ?.filter((discount) => discount.applicable)
       ?.map(({code}) => code) || [];
+
+  useEffect(() => {
+    const codesData = analyticsCart.discountCodes || [];
+
+    const submittedCodeEntry = codesData?.find(
+      (c) => c.code.toLowerCase() === lastSubmittedCode.toLowerCase(),
+    );
+
+    if (submittedCodeEntry) {
+      if (submittedCodeEntry.applicable) {
+        setCodeTyped('');
+        publish('custom_promo_code_applied', {
+          cart: analyticsCart,
+          customData: {promoCode: lastSubmittedCode},
+        });
+      } else {
+        publish('custom_promo_code_denied', {
+          cart: analyticsCart,
+          customData: {
+            promoCode: lastSubmittedCode,
+            reason: 'not_applicable',
+          },
+        });
+      }
+    }
+  }, [lastSubmittedCode, publish, analyticsCart]);
 
   return (
     <div>
@@ -72,11 +102,30 @@ function CartDiscounts({discountCodes}) {
 
       {/* Show an input to apply a discount */}
       <UpdateDiscountForm discountCodes={codes}>
-        <div>
-          <input type="text" name="discountCode" placeholder="Discount code" />
-          &nbsp;
-          <button type="submit">Apply</button>
-        </div>
+        {() => {
+          const handleApply = () => {
+            publish('custom_promo_code_entered', {
+              cart: analyticsCart,
+              customData: {promoCode: codeTyped},
+            });
+            setLastSubmittedCode(codeTyped);
+          };
+
+          return (
+            <div>
+              <input
+                type="text"
+                name="discountCode"
+                placeholder="Discount code"
+                onChange={(e) => setCodeTyped(e.target.value)}
+              />
+              &nbsp;
+              <button onClick={handleApply} type="submit">
+                Apply
+              </button>
+            </div>
+          );
+        }}
       </UpdateDiscountForm>
     </div>
   );
