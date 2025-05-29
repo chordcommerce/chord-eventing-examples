@@ -80,6 +80,7 @@ function CartDiscounts({discountCodes}) {
             reason: 'not_applicable',
           },
         });
+        setLastSubmittedCode('');
       }
     }
   }, [lastSubmittedCode, publish, analyticsCart]);
@@ -91,11 +92,25 @@ function CartDiscounts({discountCodes}) {
         <div>
           <dt>Discount(s)</dt>
           <UpdateDiscountForm>
-            <div className="cart-discount">
-              <code>{codes?.join(', ')}</code>
-              &nbsp;
-              <button>Remove</button>
-            </div>
+            {() => {
+              const handleRemove = (codes) => {
+                publish('custom_promo_code_removed', {
+                  cart: analyticsCart,
+                  customData: {promoCode: codes},
+                });
+                setLastSubmittedCode('');
+              };
+
+              return (
+                <div className="cart-discount">
+                  <code>{codes?.join(', ')}</code>
+                  &nbsp;
+                  <button onClick={() => handleRemove(codes?.join(', '))}>
+                    Remove
+                  </button>
+                </div>
+              );
+            }}
           </UpdateDiscountForm>
         </div>
       </dl>
