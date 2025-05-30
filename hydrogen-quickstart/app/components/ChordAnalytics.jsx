@@ -110,6 +110,61 @@ export function ChordAnalytics({
         })),
       });
     });
+
+    subscribe('custom_promo_code_denied', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponDenied({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+        reason: customData?.reason,
+      });
+    });
+
+    subscribe('custom_promo_code_applied', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponApplied({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+      });
+    });
+
+    subscribe('custom_promo_code_entered', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponEntered({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+      });
+    });
+
+    subscribe('custom_promo_code_removed', (data = {}) => {
+      const {cart, customData} = data;
+
+      chord.trackCouponRemoved({
+        cartId: parseGid(cart?.id)?.id,
+        couponName: customData?.promoCode,
+      });
+    });
+
+    subscribe('custom_product_clicked', (data = {}) => {
+      const {cart, customData} = data;
+      const {listId, listName, products} = customData || {};
+      const product = products?.[0];
+      if (!product) return;
+
+      chord.trackProductClicked({
+        cart,
+        listId,
+        listName,
+        product: {
+          product,
+          quantity: product.quantity,
+          variantId: product.variantId,
+        },
+      });
+    });
   }, []);
 
   return null;
