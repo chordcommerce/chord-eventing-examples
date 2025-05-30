@@ -22,11 +22,16 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
-    connectSrc: ["'self'", 'https://development.cdp.ingest.chord.co'],
+    connectSrc: [
+      "'self'",
+      'https://development.cdp.ingest.chord.co',
+      'https://production.cdp.ingest.chord.co',
+    ],
     scriptSrc: [
       "'self'",
       'https://cdn.shopify.com',
       'https://development.cdp.ingest.chord.co',
+      'https://production.cdp.ingest.chord.co',
     ],
   });
 

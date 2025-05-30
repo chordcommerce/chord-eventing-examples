@@ -139,6 +139,7 @@ export default function Product() {
               variantId: selectedVariant?.id || '',
               variantTitle: selectedVariant?.title || '',
               quantity: 1,
+              sku: selectedVariant?.sku || '',
             },
           ],
         }}
