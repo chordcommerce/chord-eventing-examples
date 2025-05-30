@@ -79,6 +79,7 @@ const createChordOptions = ({
   cdpWriteKey,
 }) => ({
   consent: 'shopify',
+  awaitConsent: false,
   cdpDomain,
   cdpWriteKey,
   formatters: {
