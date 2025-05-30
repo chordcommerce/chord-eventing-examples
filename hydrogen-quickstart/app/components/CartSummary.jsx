@@ -58,33 +58,6 @@ function CartDiscounts({discountCodes}) {
       ?.filter((discount) => discount.applicable)
       ?.map(({code}) => code) || [];
 
-  useEffect(() => {
-    const codesData = analyticsCart.discountCodes || [];
-
-    const submittedCodeEntry = codesData?.find(
-      (c) => c.code.toLowerCase() === lastSubmittedCode.toLowerCase(),
-    );
-
-    if (submittedCodeEntry) {
-      if (submittedCodeEntry.applicable) {
-        setCodeTyped('');
-        publish('custom_promo_code_applied', {
-          cart: analyticsCart,
-          customData: {promoCode: lastSubmittedCode},
-        });
-      } else {
-        publish('custom_promo_code_denied', {
-          cart: analyticsCart,
-          customData: {
-            promoCode: lastSubmittedCode,
-            reason: 'not_applicable',
-          },
-        });
-        setLastSubmittedCode('');
-      }
-    }
-  }, [lastSubmittedCode, publish, analyticsCart]);
-
   return (
     <div>
       {/* Have existing discount, display it with a remove option */}
@@ -98,7 +71,6 @@ function CartDiscounts({discountCodes}) {
                   cart: analyticsCart,
                   customData: {promoCode: codes},
                 });
-                setLastSubmittedCode('');
               };
 
               return (
@@ -125,6 +97,33 @@ function CartDiscounts({discountCodes}) {
             });
             setLastSubmittedCode(codeTyped);
           };
+
+          useEffect(() => {
+            if (!lastSubmittedCode) return;
+
+            const submittedCodeEntry = analyticsCart.discountCodes.find(
+              (c) => c.code.toLowerCase() === lastSubmittedCode.toLowerCase(),
+            );
+
+            if (submittedCodeEntry) {
+              if (submittedCodeEntry.applicable) {
+                setCodeTyped('');
+
+                publish('custom_promo_code_applied', {
+                  cart: analyticsCart,
+                  customData: {promoCode: lastSubmittedCode},
+                });
+              } else {
+                publish('custom_promo_code_denied', {
+                  cart: analyticsCart,
+                  customData: {
+                    promoCode: lastSubmittedCode,
+                    reason: 'not_applicable',
+                  },
+                });
+              }
+            }
+          }, [lastSubmittedCode, publish, analyticsCart]);
 
           return (
             <div>
