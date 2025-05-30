@@ -135,7 +135,7 @@ function CartDiscounts({discountCodes}) {
                 onChange={(e) => setCodeTyped(e.target.value)}
               />
               &nbsp;
-              <button onClick={handleApply} type="submit">
+              <button onClick={() => handleApply()} type="submit">
                 Apply
               </button>
             </div>
