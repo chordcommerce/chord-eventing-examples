@@ -56,15 +56,15 @@ function loadDeferredData({context}) {
 
 export default function Collection() {
   /** @type {LoaderReturnData} */
-  const {products, collection} = useLoaderData();
+  const {products} = useLoaderData();
 
   return (
     <div className="collection">
       <Analytics.CollectionView
         data={{
           collection: {
-            id: collection.id,
-            handle: collection.handle,
+            id: 'all',
+            handle: 'all',
           },
         }}
         customData={{
