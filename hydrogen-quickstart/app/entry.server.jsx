@@ -27,6 +27,7 @@ export default async function handleRequest(
       'https://development.cdp.ingest.chord.co',
       'https://production.cdp.ingest.chord.co',
       'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
     ],
     scriptSrc: [
       "'self'",
@@ -34,6 +35,7 @@ export default async function handleRequest(
       'https://development.cdp.ingest.chord.co',
       'https://production.cdp.ingest.chord.co',
       'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
     ],
   });
 
