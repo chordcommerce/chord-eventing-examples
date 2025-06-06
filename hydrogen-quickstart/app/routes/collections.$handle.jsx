@@ -99,6 +99,14 @@ export default function Collection() {
             handle: collection.handle,
           },
         }}
+        customData={{
+          products: collection.products.nodes.map((product) => ({
+            product: {
+              ...product,
+            },
+            quantity: 1,
+          })),
+        }}
       />
     </div>
   );

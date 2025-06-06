@@ -2,6 +2,7 @@ import {useLoaderData} from 'react-router';
 import {CartForm} from '@shopify/hydrogen';
 import {data} from '@shopify/remix-oxygen';
 import {CartMain} from '~/components/CartMain';
+import {Analytics} from '@shopify/hydrogen';
 
 /**
  * @type {MetaFunction}
@@ -114,6 +115,7 @@ export default function Cart() {
   return (
     <div className="cart">
       <h1>Cart</h1>
+      <Analytics.CartView />
       <CartMain layout="page" cart={cart} />
     </div>
   );

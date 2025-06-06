@@ -97,6 +97,7 @@ export function ChordAnalytics({
 
     subscribe('collection_viewed', (data = {}) => {
       const {collection, customData} = data;
+
       if (!collection) return;
       const {products} = customData || {};
 
