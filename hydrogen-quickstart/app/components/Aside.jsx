@@ -1,3 +1,4 @@
+import {Analytics} from '@shopify/hydrogen';
 import {createContext, useContext, useEffect, useState} from 'react';
 
 /**
@@ -42,7 +43,9 @@ export function Aside({children, heading, type}) {
       className={`overlay ${expanded ? 'expanded' : ''}`}
       role="dialog"
     >
+      {type === 'cart' && expanded && <Analytics.CartView />}
       <button className="close-outside" onClick={close} />
+
       <aside>
         <header>
           <h3>{heading}</h3>

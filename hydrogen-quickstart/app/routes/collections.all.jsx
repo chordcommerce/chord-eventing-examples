@@ -2,6 +2,7 @@ import {useLoaderData} from 'react-router';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
+import {Analytics} from '@shopify/hydrogen';
 
 /**
  * @type {MetaFunction<typeof loader>}
@@ -55,11 +56,28 @@ function loadDeferredData({context}) {
 
 export default function Collection() {
   /** @type {LoaderReturnData} */
-  const {products} = useLoaderData();
+  const {products, collection} = useLoaderData();
 
   return (
     <div className="collection">
+      <Analytics.CollectionView
+        data={{
+          collection: {
+            id: collection.id,
+            handle: collection.handle,
+          },
+        }}
+        customData={{
+          products: products.nodes.map((product) => ({
+            product: {
+              ...product,
+            },
+            quantity: 1,
+          })),
+        }}
+      />
       <h1>Products</h1>
+
       <PaginatedResourceSection
         connection={products}
         resourcesClassName="products-grid"

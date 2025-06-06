@@ -95,8 +95,13 @@ export function ChordAnalytics({
       });
     });
 
+    subscribe('search_viewed', (data = {}) => {
+      chord.trackProductsSearched({query: data.searchTerm});
+    });
+
     subscribe('collection_viewed', (data = {}) => {
       const {collection, customData} = data;
+
       if (!collection) return;
       const {products} = customData || {};
 
