@@ -5,11 +5,13 @@ import { useParams } from 'next/navigation'
 import { useEffect } from 'react'
 
 import { useChord } from '@/app/hooks/useChord'
+import { useCart } from '@/app/contexts/cart-context'
 import { products } from '@/app/data/products'
 
 export default function ProductPage() {
   const params = useParams()
   const chord = useChord()
+  const { addToCart } = useCart()
   const product = products.find((p) => p.id === params.id)
 
   useEffect(() => {
@@ -21,7 +23,6 @@ export default function ProductPage() {
         sku: product.sku,
         brand: product.brand,
       }
-
       chord.trackProductViewed({
         product: {
           product: analyticsProduct,
@@ -33,7 +34,12 @@ export default function ProductPage() {
     }
   }, [chord, product])
 
+  if (!product) {
+    return <div>Product not found</div>
+  }
+
   const handleAddToCart = () => {
+    addToCart(product)
     if (chord && product) {
       const analyticsProduct = {
         id: product.id,
@@ -53,10 +59,6 @@ export default function ProductPage() {
     }
   }
 
-  if (!product) {
-    return <div>Product not found</div>
-  }
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -71,19 +73,11 @@ export default function ProductPage() {
         <div className="space-y-4">
           <h1 className="text-3xl font-bold">{product.name}</h1>
           <p className="text-2xl font-semibold">${product.price.toFixed(2)}</p>
-          <p className="text-gray-600">{product.description}</p>
-          <div className="space-y-2">
-            <p>
-              <span className="font-semibold">Brand:</span> {product.brand}
-            </p>
-            <p>
-              <span className="font-semibold">SKU:</span> {product.sku}
-            </p>
-          </div>
+          <p className="text-white">{product.description}</p>
           <div className="pt-4">
             <button
-              className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
               onClick={handleAddToCart}
+              className="bg-white text-black px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
             >
               Add to Cart
             </button>

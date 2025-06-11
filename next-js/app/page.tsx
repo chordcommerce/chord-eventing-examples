@@ -61,9 +61,9 @@ export default function Home() {
                 />
               </div>
               <div className="p-4">
-                <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
-                <p className="text-gray-600 text-sm mb-2">{product.brand}</p>
-                <p className="text-xl font-bold">${product.price.toFixed(2)}</p>
+                <h2 className="text-black text-lg font-semibold mb-2">{product.name}</h2>
+                <p className="text-black text-sm mb-2">{product.brand}</p>
+                <p className="text-black text-xl font-bold">${product.price.toFixed(2)}</p>
               </div>
             </div>
           </Link>
