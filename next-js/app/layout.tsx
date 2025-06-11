@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { ChordProvider } from './contexts/chord-context'
+import { AnalyticsLayout } from './components/analytics-layout'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -15,7 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ChordProvider>{children}</ChordProvider>
+        <ChordProvider>
+          <AnalyticsLayout>
+            {children}
+          </AnalyticsLayout>
+        </ChordProvider>
       </body>
     </html>
   )
