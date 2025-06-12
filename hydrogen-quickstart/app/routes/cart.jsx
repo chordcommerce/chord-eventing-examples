@@ -73,6 +73,10 @@ export async function action({request, context}) {
       });
       break;
     }
+    case CartForm.ACTIONS.AttributesUpdateInput: {
+      result = await cart.updateAttributes(inputs.attributes);
+      break;
+    }
     default:
       throw new Error(`${action} cart action is not defined`);
   }

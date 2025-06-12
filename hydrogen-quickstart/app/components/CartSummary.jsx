@@ -27,6 +27,42 @@ export function CartSummary({cart, layout}) {
     </div>
   );
 }
+
+export default function AttributeUpdateForm() {
+  const [sscid, setSscid] = useState('');
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    setSscid(urlParams.get('sscid') || '');
+
+    if (!sscid) {
+      return;
+    }
+
+    const button = document.getElementById('update-attributes-button');
+    if (button) {
+      button.click();
+    }
+  }, [sscid]);
+
+  return (
+    <CartForm
+      id="auto-attribute-update-form"
+      route="/cart"
+      action={CartForm.ACTIONS.AttributesUpdateInput}
+      inputs={{attributes: [{key: 'sscid', value: sscid}]}}
+      style={{display: 'none'}}
+    >
+      <button
+        id="update-attributes-button"
+        type="submit"
+        style={{display: 'none'}}
+      >
+        Update attribute
+      </button>
+    </CartForm>
+  );
+}
+
 /**
  * @param {{checkoutUrl?: string}}
  */
@@ -34,12 +70,15 @@ function CartCheckoutActions({checkoutUrl}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
-      </a>
-      <br />
-    </div>
+    <>
+      <AttributeUpdateForm />
+      <div>
+        <a href={checkoutUrl} target="_self">
+          <p>Continue to Checkout &rarr;</p>
+        </a>
+        <br />
+      </div>
+    </>
   );
 }
 
