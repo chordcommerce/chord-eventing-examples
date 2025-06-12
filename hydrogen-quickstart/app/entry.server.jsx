@@ -40,6 +40,7 @@ export default async function handleRequest(
       'https://production.cdp.ingest.chord.co',
       'https://www.googletagmanager.com',
       'https://www.google-analytics.com',
+      'https://sneakpeek-1.s3.us-east-1.amazonaws.com',
     ],
   });
 
