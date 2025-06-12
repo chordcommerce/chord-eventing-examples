@@ -45,7 +45,6 @@ export default function AttributeUpdateForm() {
     }
 
     setSscid(getCookieValue('sscid'));
-    console.log('sscid', sscid);
 
     if (!sscid) {
       return;
