@@ -8,6 +8,8 @@ export function CartSummary({cart, layout}) {
   const className =
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
 
+  // console.log(cart);
+
   return (
     <div aria-labelledby="cart-summary" className={className}>
       <h4>Totals</h4>
@@ -27,6 +29,53 @@ export function CartSummary({cart, layout}) {
     </div>
   );
 }
+
+export default function AttributeUpdateForm() {
+  const [sscid, setSscid] = useState('');
+  useEffect(() => {
+    // Submit the form automatically on mount
+
+    // Read the 'sscid' value from browser cookies
+    function getCookieValue(name) {
+      if (typeof document === 'undefined') return '';
+      const match = document.cookie.match(
+        new RegExp('(^| )' + name + '=([^;]+)'),
+      );
+      return match ? decodeURIComponent(match[2]) : '';
+    }
+
+    setSscid(getCookieValue('sscid'));
+    console.log('sscid', sscid);
+
+    if (!sscid) {
+      return;
+    }
+    // Trigger a click on the update-attributes-button button
+    const button = document.getElementById('update-attributes-button');
+    if (button) {
+      button.click();
+    }
+  }, [sscid]);
+
+  return (
+    <CartForm
+      id="auto-attribute-update-form"
+      route="/cart"
+      action={CartForm.ACTIONS.AttributesUpdateInput}
+      inputs={{attributes: [{key: 'sscid', value: sscid}]}}
+      style={{display: 'none'}}
+    >
+      <button
+        id="update-attributes-button"
+        type="submit"
+        style={{display: 'none'}}
+      >
+        Update attribute
+      </button>
+    </CartForm>
+  );
+}
+
 /**
  * @param {{checkoutUrl?: string}}
  */
@@ -34,12 +83,15 @@ function CartCheckoutActions({checkoutUrl}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
-      </a>
-      <br />
-    </div>
+    <>
+      <AttributeUpdateForm />
+      <div>
+        <a href={checkoutUrl} target="_self">
+          <p>Continue to Checkout &rarr;</p>
+        </a>
+        <br />
+      </div>
+    </>
   );
 }
 
