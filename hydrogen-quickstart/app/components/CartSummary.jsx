@@ -8,8 +8,6 @@ export function CartSummary({cart, layout}) {
   const className =
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
 
-  // console.log(cart);
-
   return (
     <div aria-labelledby="cart-summary" className={className}>
       <h4>Totals</h4>
@@ -33,23 +31,13 @@ export function CartSummary({cart, layout}) {
 export default function AttributeUpdateForm() {
   const [sscid, setSscid] = useState('');
   useEffect(() => {
-    // Submit the form automatically on mount
-
-    // Read the 'sscid' value from browser cookies
-    function getCookieValue(name) {
-      if (typeof document === 'undefined') return '';
-      const match = document.cookie.match(
-        new RegExp('(^| )' + name + '=([^;]+)'),
-      );
-      return match ? decodeURIComponent(match[2]) : '';
-    }
-
-    setSscid(getCookieValue('sscid'));
+    const urlParams = new URLSearchParams(window.location.search);
+    setSscid(urlParams.get('sscid') || '');
 
     if (!sscid) {
       return;
     }
-    // Trigger a click on the update-attributes-button button
+
     const button = document.getElementById('update-attributes-button');
     if (button) {
       button.click();

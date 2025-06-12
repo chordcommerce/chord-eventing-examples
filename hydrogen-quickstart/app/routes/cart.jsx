@@ -45,6 +45,7 @@ export async function action({request, context}) {
       break;
     case CartForm.ACTIONS.DiscountCodesUpdate: {
       const formDiscountCode = inputs.discountCode;
+
       // User inputted discount code
       const discountCodes = formDiscountCode ? [formDiscountCode] : [];
 
