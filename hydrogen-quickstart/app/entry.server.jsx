@@ -30,6 +30,7 @@ export default async function handleRequest(
       'https://localhost:8080',
       'https://www.googletagmanager.com',
       'https://www.google-analytics.com',
+      'https://analytics.tiktok.com/',
     ],
     scriptSrc: [
       "'self'",
@@ -41,6 +42,7 @@ export default async function handleRequest(
       'https://www.googletagmanager.com',
       'https://www.google-analytics.com',
       'https://sneakpeek-1.s3.us-east-1.amazonaws.com',
+      'https://analytics.tiktok.com/',
     ],
   });
 
