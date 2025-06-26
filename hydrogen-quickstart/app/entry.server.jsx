@@ -31,7 +31,10 @@ export default async function handleRequest(
       'https://www.googletagmanager.com',
       'https://www.google-analytics.com',
       'https://analytics.tiktok.com/',
+      'https://*.facebook.com',
+      'https://connect.facebook.net',
     ],
+    frameSrc: ['https://www.googletagmanager.com', 'https://*.facebook.com'],
     scriptSrc: [
       "'self'",
       'https://cdn.shopify.com',
@@ -43,6 +46,14 @@ export default async function handleRequest(
       'https://www.google-analytics.com',
       'https://sneakpeek-1.s3.us-east-1.amazonaws.com',
       'https://analytics.tiktok.com/',
+      'https://connect.facebook.net',
+      'https://facebook.com/',
+    ],
+    imgSrc: [
+      "'self'",
+      'data:',
+      'https://cdn.shopify.com',
+      'https://*.facebook.com',
     ],
   });
 
