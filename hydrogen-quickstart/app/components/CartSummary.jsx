@@ -1,6 +1,6 @@
 import {CartForm, Money, useAnalytics} from '@shopify/hydrogen';
 import {useRef, useState, useEffect} from 'react';
-import {useChordIdentifiers} from '~/hooks/useChordIdentifiers';
+import {useChordIdentifiers} from '../hooks/useChordIdentifiers';
 
 /**
  * @param {CartSummaryProps}

@@ -1,8 +1,7 @@
 import {useEffect} from 'react';
-import {useFetcher} from '@remix-run/react';
+import {useFetcher} from 'react-router';
 import {CartForm} from '@shopify/hydrogen';
-
-import {getCookie, combineCartAttributes} from '~/lib/utils';
+import {getCookie, combineCartAttributes} from '../lib/utils';
 
 export const useChordIdentifiers = (cart) => {
   const fetcher = useFetcher();
