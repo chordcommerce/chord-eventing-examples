@@ -1,5 +1,6 @@
 import {CartForm, Money, useAnalytics} from '@shopify/hydrogen';
 import {useRef, useState, useEffect} from 'react';
+import {useChordIdentifiers} from '../hooks/useChordIdentifiers';
 
 /**
  * @param {CartSummaryProps}
@@ -7,6 +8,8 @@ import {useRef, useState, useEffect} from 'react';
 export function CartSummary({cart, layout}) {
   const className =
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
+
+  useChordIdentifiers(cart);
 
   return (
     <div aria-labelledby="cart-summary" className={className}>
