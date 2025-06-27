@@ -44,6 +44,7 @@ PUBLIC_CHORD_STORE_ID: chord to provide
 PUBLIC_CHORD_TENANT_ID: chord to provide
 PUBLIC_CHORD_CDP_DOMAIN: https://production.cdp.ingest.chord.co | https://development.cdp.ingest.chord.co | https://staging.cdp.ingest.chord.co
 PUBLIC_CHORD_CDP_WRITE_KEY: chord to provide
+PUBLIC_CHECKOUT_DOMAIN: [your-store].myshopify.com
 ```
 
 ### Implementation
@@ -69,7 +70,26 @@ The Chord Analytics functionality is delegated to a single Analytics component f
 
 3. **Root Integration** - `app/root.jsx`
 
-The Chord Analytics component is integrated at the root level of the application:
+Add a `chord` key to the object returned from the exported loader function in the `app/root.tsx` file:
+
+```
+  chord: {
+    domain: env.PUBLIC_STORE_DOMAIN,
+    omsId: env.PUBLIC_CHORD_OMS_ID,
+    storeId: env.PUBLIC_CHORD_STORE_ID,
+    tenantId: env.PUBLIC_CHORD_TENANT_ID,
+    cdpDomain: env.PUBLIC_CHORD_CDP_DOMAIN,
+    cdpWriteKey: env.PUBLIC_CHORD_CDP_WRITE_KEY,
+  }
+```
+
+That data is later accessed in the Layout component with:
+
+```
+const data = useRouteLoaderData('root');
+```
+
+And subsequently used within the Chord Analytics component at the root level of the application like so:
 
 ```
 <Analytics.Provider cart={data.cart}>
