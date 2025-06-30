@@ -109,9 +109,9 @@ And subsequently used within the Chord Analytics component at the root level of 
 </Analytics.Provider>
 ```
 
-4. Content Security Policy Configuration `app/entry.server.tsx`
+4. **Content Security Policy Configuration** - `app/entry.server.tsx`
 
-Add the Chord CDP Domain (<https://production.cdp.ingest.chord.co>) and the domain's of any device mode destiantions to the relevant CSP directives
+Add the Chord CDP Domain and the domains of any device mode destiantions to the relevant CSP directives
 
 ```
 connectSrc: [
@@ -135,9 +135,22 @@ This allows the application to load and execute JavaScript from the Chord domain
 
 The CSP configuration ensures that:
 
-1. The application can send analytics data to Chord's servers
-2. Chord's JavaScript tracking code can be loaded and executed
-3. These operations are explicitly allowed by the browser's security policy
+- The application can send analytics data to Chord's servers
+- Chord's JavaScript tracking code can be loaded and executed
+- These operations are explicitly allowed by the browser's security policy
+
+5. **Add the** `useChordIdentifiers` **hook** - `app/hooks/useChordIdentifiers`
+
+This is a custom hook designed to capture and store user identification data from browser cookies into the Shopify cart attributes. This enables the CDP to associate anonymous users with cart sessions.
+
+Please see the implementation of the hook in `app/components/CartSummary` - every time a user views their cart summary, the system automatically:
+Checks if there are any new user identifiers in browser cookies and
+compares/updates them with what's already stored in the cart.
+
+The code of the hook relies on two exported functions from `app/lib/utils.js`:
+
+- `getCookie`
+- `combineCartAttributes`
 
 ## Event Tracking Examples
 
