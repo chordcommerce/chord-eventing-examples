@@ -1,6 +1,7 @@
 import {parseGid, useAnalytics} from '@shopify/hydrogen';
 import {useEffect, useMemo} from 'react';
 import {createChordClient} from '../lib/chord';
+import {getCookie} from '../lib/utils';
 
 export function ChordAnalytics({
   currency,
@@ -27,9 +28,13 @@ export function ChordAnalytics({
     });
   }, []);
 
+  const googleClientId = getCookie('_ga')?.substring(6);
+
   useEffect(() => {
     subscribe('page_viewed', () => {
-      chord.page();
+      chord.page({
+        googleClientId,
+      });
     });
 
     subscribe('cart_updated', (data) => {
