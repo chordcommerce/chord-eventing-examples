@@ -33,6 +33,7 @@ export default async function handleRequest(
       'https://analytics.tiktok.com/',
       'https://*.facebook.com',
       'https://connect.facebook.net',
+      'https://www.google.com/',
     ],
     frameSrc: ['https://www.googletagmanager.com', 'https://*.facebook.com'],
     scriptSrc: [
@@ -48,6 +49,7 @@ export default async function handleRequest(
       'https://analytics.tiktok.com/',
       'https://connect.facebook.net',
       'https://facebook.com/',
+      'https://www.google.com/',
     ],
     imgSrc: [
       "'self'",
