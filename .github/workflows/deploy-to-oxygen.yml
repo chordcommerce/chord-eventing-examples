@@ -86,6 +86,6 @@ jobs:
 
       - name: Build and Publish to Oxygen
         working-directory: ./hydrogen-quickstart
-        run: npx shopify hydrogen deploy
+        run: npx shopify hydrogen deploy --force
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000038472 }}
