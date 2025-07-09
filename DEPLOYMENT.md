@@ -55,7 +55,14 @@ The workflow runs linting checks but continues deployment even if warnings remai
 
 ## Troubleshooting
 
-If you encounter the `npm ci` error, ensure that:
+### Common Issues
+
+**npm ci error**: Ensure that:
 1. The workflow is running in the correct directory (`hydrogen-quickstart`)
 2. The `package-lock.json` file exists in the `hydrogen-quickstart` directory
-3. The `cache-dependency-path` is correctly set to `hydrogen-quickstart/package-lock.json` 
+3. The `cache-dependency-path` is correctly set to `hydrogen-quickstart/package-lock.json`
+
+**Rollup build error**: The workflow includes fixes for the common Rollup optional dependencies issue:
+- Clears npm cache before installation
+- Uses `--legacy-peer-deps` flag to avoid conflicts
+- Rebuilds the Rollup Linux binary if needed 

@@ -28,7 +28,13 @@ jobs:
           
       - name: Install dependencies
         working-directory: ./hydrogen-quickstart
-        run: npm ci
+        run: |
+          # Clear npm cache to avoid optional dependencies issues
+          npm cache clean --force
+          # Install with legacy peer deps to avoid conflicts
+          npm ci --legacy-peer-deps
+          # Ensure Rollup binary is properly installed
+          npm rebuild @rollup/rollup-linux-x64-gnu || npm install @rollup/rollup-linux-x64-gnu
         
       - name: Run linting (optional)
         working-directory: ./hydrogen-quickstart
@@ -57,7 +63,13 @@ jobs:
           
       - name: Install dependencies
         working-directory: ./hydrogen-quickstart
-        run: npm ci
+        run: |
+          # Clear npm cache to avoid optional dependencies issues
+          npm cache clean --force
+          # Install with legacy peer deps to avoid conflicts
+          npm ci --legacy-peer-deps
+          # Ensure Rollup binary is properly installed
+          npm rebuild @rollup/rollup-linux-x64-gnu || npm install @rollup/rollup-linux-x64-gnu
         
       - name: Build project
         working-directory: ./hydrogen-quickstart
