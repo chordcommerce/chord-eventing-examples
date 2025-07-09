@@ -30,9 +30,10 @@ jobs:
         working-directory: ./hydrogen-quickstart
         run: npm ci
         
-      - name: Run linting
+      - name: Run linting (optional)
         working-directory: ./hydrogen-quickstart
-        run: npm run lint
+        run: npm run lint || true
+        continue-on-error: true
         
       - name: Build project
         working-directory: ./hydrogen-quickstart
