@@ -63,6 +63,7 @@ The workflow runs linting checks but continues deployment even if warnings remai
 3. The `cache-dependency-path` is correctly set to `hydrogen-quickstart/package-lock.json`
 
 **Rollup build error**: The workflow includes fixes for the common Rollup optional dependencies issue:
+- Removes existing `node_modules` and `package-lock.json` as suggested by the error
 - Clears npm cache before installation
-- Uses `--legacy-peer-deps` flag to avoid conflicts
-- Rebuilds the Rollup Linux binary if needed 
+- Performs fresh `npm install` instead of `npm ci`
+- Explicitly installs the Rollup Linux binary 
