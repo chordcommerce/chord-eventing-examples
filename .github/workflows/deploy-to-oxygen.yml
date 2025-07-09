@@ -1,0 +1,91 @@
+name: Deploy to Shopify Oxygen
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'hydrogen-quickstart/**'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'hydrogen-quickstart/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        working-directory: ./hydrogen-quickstart
+        run: |
+          # Remove existing node_modules and package-lock.json as suggested by the error
+          rm -rf node_modules package-lock.json
+          # Clear npm cache to avoid optional dependencies issues
+          npm cache clean --force
+          # Install dependencies fresh
+          npm install
+          # Explicitly install Rollup binary for Linux
+          npm install @rollup/rollup-linux-x64-gnu
+        
+      - name: Run linting (optional)
+        working-directory: ./hydrogen-quickstart
+        run: npm run lint || true
+        continue-on-error: true
+        
+      - name: Build project
+        working-directory: ./hydrogen-quickstart
+        run: npm run build
+
+  deploy:
+    needs: test
+    name: Deploy to Oxygen
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          check-latest: true
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+            
+      - name: Install dependencies
+        working-directory: ./hydrogen-quickstart
+        run: |
+          # Remove existing node_modules and package-lock.json as suggested by the error
+          rm -rf node_modules package-lock.json
+          # Clear npm cache to avoid optional dependencies issues
+          npm cache clean --force
+          # Install dependencies fresh
+          npm install
+          # Explicitly install Rollup binary for Linux
+          npm install @rollup/rollup-linux-x64-gnu
+
+      - name: Build and Publish to Oxygen
+        working-directory: ./hydrogen-quickstart
+        run: npx shopify hydrogen deploy --force
+        env:
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000038472 }}
