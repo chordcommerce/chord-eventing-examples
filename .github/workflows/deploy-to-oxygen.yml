@@ -1,0 +1,71 @@
+name: Deploy to Shopify Oxygen
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'hydrogen-quickstart/**'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'hydrogen-quickstart/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: hydrogen-quickstart/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ./hydrogen-quickstart
+        run: npm ci
+        
+      - name: Run linting
+        working-directory: ./hydrogen-quickstart
+        run: npm run lint
+        
+      - name: Build project
+        working-directory: ./hydrogen-quickstart
+        run: npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: hydrogen-quickstart/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ./hydrogen-quickstart
+        run: npm ci
+        
+      - name: Build project
+        working-directory: ./hydrogen-quickstart
+        run: npm run build
+        
+      - name: Deploy to Shopify Oxygen
+        working-directory: ./hydrogen-quickstart
+        run: |
+          npx @shopify/cli oxygen deploy
+        env:
+          SHOPIFY_CLI_TOKEN: ${{ secrets.SHOPIFY_CLI_TOKEN }}
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }} 
