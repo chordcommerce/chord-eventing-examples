@@ -63,6 +63,8 @@ export function links() {
  * @param {LoaderFunctionArgs} args
  */
 export async function loader(args) {
+  console.log('change');
+
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
 

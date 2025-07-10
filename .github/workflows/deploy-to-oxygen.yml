@@ -14,16 +14,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          
+
       - name: Install dependencies
         working-directory: ./hydrogen-quickstart
         run: |
@@ -35,12 +35,12 @@ jobs:
           npm install
           # Explicitly install Rollup binary for Linux
           npm install @rollup/rollup-linux-x64-gnu
-        
+
       - name: Run linting (optional)
         working-directory: ./hydrogen-quickstart
         run: npm run lint || true
         continue-on-error: true
-        
+
       - name: Build project
         working-directory: ./hydrogen-quickstart
         run: npm run build
@@ -56,7 +56,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
           check-latest: true
 
       - name: Cache node modules
@@ -71,7 +71,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-            
+
       - name: Install dependencies
         working-directory: ./hydrogen-quickstart
         run: |
@@ -88,4 +88,4 @@ jobs:
         working-directory: ./hydrogen-quickstart
         run: npx shopify hydrogen deploy --force
         env:
-          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000038472 }}
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000038565 }}
