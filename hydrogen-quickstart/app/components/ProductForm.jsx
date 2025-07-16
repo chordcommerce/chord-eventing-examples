@@ -1,14 +1,16 @@
 import {Link, useNavigate} from 'react-router';
+
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 
-/**
- * @param {{
- *   productOptions: MappedProductOptions[];
- *   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
- * }}
- */
-export function ProductForm({productOptions, selectedVariant}) {
+import {SellingPlanSelector} from '~/components/SellingPlanSelector';
+
+export function ProductForm({
+  productOptions,
+  selectedVariant,
+  sellingPlanGroups,
+  selectedSellingPlan,
+}) {
   const navigate = useNavigate();
   const {open} = useAside();
   return (
@@ -114,16 +116,52 @@ export function ProductForm({productOptions, selectedVariant}) {
       >
         {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
       </AddToCartButton>
+
+      {sellingPlanGroups.nodes.length > 0 ? (
+        <>
+          <br />
+          <hr />
+          <br />
+          <h3>Subscription Options</h3>
+          <SellingPlanSelector
+            sellingPlanGroups={sellingPlanGroups}
+            selectedSellingPlan={selectedSellingPlan}
+            selectedVariant={selectedVariant}
+          >
+            {({sellingPlanGroup}) => (
+              <SellingPlanGroup
+                key={sellingPlanGroup.name}
+                sellingPlanGroup={sellingPlanGroup}
+              />
+            )}
+          </SellingPlanSelector>
+          <br />
+          <AddToCartButton
+            disabled={!selectedSellingPlan}
+            onClick={() => {
+              open('cart');
+            }}
+            lines={
+              selectedSellingPlan && selectedVariant
+                ? [
+                    {
+                      quantity: 1,
+                      selectedVariant,
+                      sellingPlanId: selectedSellingPlan.id,
+                      merchandiseId: selectedVariant.id,
+                    },
+                  ]
+                : []
+            }
+          >
+            {selectedSellingPlan ? 'Subscribe' : 'Select Subscription'}
+          </AddToCartButton>
+        </>
+      ) : null}
     </div>
   );
 }
 
-/**
- * @param {{
- *   swatch?: Maybe<ProductOptionValueSwatch> | undefined;
- *   name: string;
- * }}
- */
 function ProductOptionSwatch({swatch, name}) {
   const image = swatch?.image?.previewImage?.url;
   const color = swatch?.color;
@@ -143,7 +181,33 @@ function ProductOptionSwatch({swatch, name}) {
   );
 }
 
-/** @typedef {import('@shopify/hydrogen').MappedProductOptions} MappedProductOptions */
-/** @typedef {import('@shopify/hydrogen/storefront-api-types').Maybe} Maybe */
-/** @typedef {import('@shopify/hydrogen/storefront-api-types').ProductOptionValueSwatch} ProductOptionValueSwatch */
-/** @typedef {import('storefrontapi.generated').ProductFragment} ProductFragment */
+// Update as you see fit to match your design and requirements
+function SellingPlanGroup({sellingPlanGroup}) {
+  return (
+    <div className="selling-plan-group" key={sellingPlanGroup.name}>
+      <p className="selling-plan-group-title">
+        <strong>{sellingPlanGroup.name}:</strong>
+      </p>
+      {sellingPlanGroup.sellingPlans.nodes.map((sellingPlan) => {
+        return (
+          <Link
+            key={sellingPlan.id}
+            prefetch="intent"
+            to={sellingPlan.url}
+            className={`selling-plan ${
+              sellingPlan.isSelected ? 'selected' : 'unselected'
+            }`}
+            preventScrollReset
+            replace
+          >
+            <p>
+              {sellingPlan.options.map(
+                (option) => `${option.name} ${option.value}`,
+              )}
+            </p>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}

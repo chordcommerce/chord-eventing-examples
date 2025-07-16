@@ -6,12 +6,14 @@ export function shouldRevalidate() {
   return true;
 }
 
-/**
- * @param {LoaderFunctionArgs}
- */
 export async function loader({context}) {
   const {data, errors} = await context.customerAccount.query(
     CUSTOMER_DETAILS_QUERY,
+    {
+      variables: {
+        language: context.storefront.i18n.language,
+      },
+    },
   );
 
   if (errors?.length || !data?.customer) {
@@ -29,7 +31,6 @@ export async function loader({context}) {
 }
 
 export default function AccountLayout() {
-  /** @type {LoaderReturnData} */
   const {customer} = useLoaderData();
 
   const heading = customer
@@ -84,6 +85,3 @@ function Logout() {
     </Form>
   );
 }
-
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

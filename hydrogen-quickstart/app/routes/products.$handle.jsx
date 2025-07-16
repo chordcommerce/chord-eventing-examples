@@ -1,3 +1,4 @@
+import {redirect} from '@shopify/remix-oxygen';
 import {useLoaderData} from 'react-router';
 import {
   getSelectedProductOptions,
@@ -12,9 +13,10 @@ import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
-/**
- * @type {MetaFunction<typeof loader>}
- */
+import sellingPanStyle from '~/styles/selling-plan.css?url';
+
+export const links = () => [{rel: 'stylesheet', href: sellingPanStyle}];
+
 export const meta = ({data}) => {
   return [
     {title: `Hydrogen | ${data?.product.title ?? ''}`},
@@ -25,9 +27,6 @@ export const meta = ({data}) => {
   ];
 };
 
-/**
- * @param {LoaderFunctionArgs} args
- */
 export async function loader(args) {
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
@@ -41,7 +40,6 @@ export async function loader(args) {
 /**
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- * @param {LoaderFunctionArgs}
  */
 async function loadCriticalData({context, params, request}) {
   const {handle} = params;
@@ -65,8 +63,33 @@ async function loadCriticalData({context, params, request}) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
+  // Initialize the selectedSellingPlan to null
+  let selectedSellingPlan = null;
+
+  // Get the selected selling plan id from the request url
+  const selectedSellingPlanId =
+    new URL(request.url).searchParams.get('selling_plan') ?? null;
+
+  // Get the selected selling plan bsed on the selectedSellingPlanId
+  if (selectedSellingPlanId) {
+    const selectedSellingPlanGroup =
+      product.sellingPlanGroups.nodes?.find((sellingPlanGroup) => {
+        return sellingPlanGroup.sellingPlans.nodes?.find(
+          (sellingPlan) => sellingPlan.id === selectedSellingPlanId,
+        );
+      }) ?? null;
+
+    if (selectedSellingPlanGroup) {
+      selectedSellingPlan =
+        selectedSellingPlanGroup.sellingPlans.nodes.find((sellingPlan) => {
+          return sellingPlan.id === selectedSellingPlanId;
+        }) ?? null;
+    }
+  }
+
   return {
     product,
+    selectedSellingPlan,
   };
 }
 
@@ -74,7 +97,6 @@ async function loadCriticalData({context, params, request}) {
  * Load data for rendering content below the fold. This data is deferred and will be
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
- * @param {LoaderFunctionArgs}
  */
 function loadDeferredData({context, params}) {
   // Put any API calls that is not critical to be available on first page render
@@ -84,8 +106,7 @@ function loadDeferredData({context, params}) {
 }
 
 export default function Product() {
-  /** @type {LoaderReturnData} */
-  const {product} = useLoaderData();
+  const {product, selectedSellingPlan} = useLoaderData();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -103,7 +124,7 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title, descriptionHtml} = product;
+  const {title, descriptionHtml, sellingPlanGroups} = product;
 
   return (
     <div className="product">
@@ -113,11 +134,15 @@ export default function Product() {
         <ProductPrice
           price={selectedVariant?.price}
           compareAtPrice={selectedVariant?.compareAtPrice}
+          selectedSellingPlan={selectedSellingPlan}
+          selectedVariant={selectedVariant}
         />
         <br />
         <ProductForm
           productOptions={productOptions}
           selectedVariant={selectedVariant}
+          selectedSellingPlan={selectedSellingPlan}
+          sellingPlanGroups={sellingPlanGroups}
         />
         <br />
         <br />
@@ -139,7 +164,6 @@ export default function Product() {
               variantId: selectedVariant?.id || '',
               variantTitle: selectedVariant?.title || '',
               quantity: 1,
-              sku: selectedVariant?.sku || '',
             },
           ],
         }}
@@ -182,7 +206,81 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
       amount
       currencyCode
     }
+  sellingPlanAllocations(first: 10) {
+      nodes {
+        sellingPlan {
+          id
+        }
+      }
+    }
   }
+`;
+
+const SELLING_PLAN_FRAGMENT = `#graphql
+  fragment SellingPlanMoney on MoneyV2 {
+    amount
+    currencyCode
+  }
+  fragment SellingPlan on SellingPlan {
+    id
+    options {
+      name
+      value
+    }
+    priceAdjustments {
+      adjustmentValue {
+        ... on SellingPlanFixedAmountPriceAdjustment {
+          __typename
+          adjustmentAmount {
+            ... on MoneyV2 {
+               ...SellingPlanMoney
+            }
+          }
+        }
+        ... on SellingPlanFixedPriceAdjustment {
+          __typename
+          price {
+            ... on MoneyV2 {
+              ...SellingPlanMoney
+            }
+          }
+        }
+        ... on SellingPlanPercentagePriceAdjustment {
+          __typename
+          adjustmentPercentage
+        }
+      }
+      orderCount
+    }
+    recurringDeliveries
+    checkoutCharge {
+      type
+      value {
+        ... on MoneyV2 {
+          ...SellingPlanMoney
+        }
+        ... on SellingPlanCheckoutChargePercentageValue {
+          percentage
+        }
+      }
+    }
+ }
+`;
+
+const SELLING_PLAN_GROUP_FRAGMENT = `#graphql
+  fragment SellingPlanGroup on SellingPlanGroup {
+    name
+    options {
+      name
+      values
+    }
+    sellingPlans(first:10) {
+      nodes {
+        ...SellingPlan
+      }
+    }
+  }
+  ${SELLING_PLAN_FRAGMENT}
 `;
 
 const PRODUCT_FRAGMENT = `#graphql
@@ -222,7 +320,13 @@ const PRODUCT_FRAGMENT = `#graphql
       description
       title
     }
+    sellingPlanGroups(first:10) {
+      nodes {
+        ...SellingPlanGroup
+      }
+    }
   }
+  ${SELLING_PLAN_GROUP_FRAGMENT}
   ${PRODUCT_VARIANT_FRAGMENT}
 `;
 
@@ -239,7 +343,3 @@ const PRODUCT_QUERY = `#graphql
   }
   ${PRODUCT_FRAGMENT}
 `;
-
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('react-router').MetaFunction<T>} MetaFunction */
-/** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */
