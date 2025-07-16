@@ -15,6 +15,7 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
 import {ChordAnalytics} from './components/ChordAnalytics';
+import useShopifyConsent from './hooks/useShopifyConsent';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -155,6 +156,7 @@ export function Layout({children}) {
   const nonce = useNonce();
   /** @type {RootLoader} */
   const data = useRouteLoaderData('root');
+  useShopifyConsent();
 
   return (
     <html lang="en">
