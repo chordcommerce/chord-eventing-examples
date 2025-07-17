@@ -1,7 +1,7 @@
-import {ServerRouter} from 'react-router';
-import {isbot} from 'isbot';
-import {renderToReadableStream} from 'react-dom/server';
-import {createContentSecurityPolicy} from '@shopify/hydrogen';
+import { ServerRouter } from 'react-router';
+import { isbot } from 'isbot';
+import { renderToReadableStream } from 'react-dom/server';
+import { createContentSecurityPolicy } from '@shopify/hydrogen';
 
 /**
  * @param {Request} request
@@ -17,14 +17,13 @@ export default async function handleRequest(
   reactRouterContext,
   context,
 ) {
-  const {nonce, header, NonceProvider} = createContentSecurityPolicy({
+  const { nonce, header, NonceProvider } = createContentSecurityPolicy({
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
     connectSrc: [
       "'self'",
-      'https://development.cdp.ingest.chord.co',
       'https://production.cdp.ingest.chord.co',
       'https://staging.cdp.ingest.chord.co',
       'http://localhost:8080',
@@ -59,7 +58,6 @@ export default async function handleRequest(
       'https://cdn.shopify.com',
       'https://localhost:8080',
       'http://localhost:8080',
-      'https://development.cdp.ingest.chord.co',
       'https://production.cdp.ingest.chord.co',
       'https://staging.cdp.ingest.chord.co',
       'https://www.googletagmanager.com',
