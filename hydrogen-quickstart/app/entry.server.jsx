@@ -45,6 +45,7 @@ export default async function handleRequest(
       'https://analytics.google.com',
       'https://stats.g.doubleclick.net',
       'https://www.googleadservices.com',
+      'https://*.criteo.com',
     ],
     frameSrc: [
       'https://www.googletagmanager.com',
@@ -52,6 +53,7 @@ export default async function handleRequest(
       'https://*.doubleclick.net',
       'https://td.doubleclick.net',
       'https://www.googletagmanager.com',
+      'https://*.criteo.com',
     ],
     scriptSrc: [
       "'self'",
@@ -68,6 +70,8 @@ export default async function handleRequest(
       'https://facebook.com/',
       'https://www.google.com/',
       'https://*.googletagmanager.com',
+      'https://*.criteo.com',
+
     ],
     imgSrc: [
       "'self'",
