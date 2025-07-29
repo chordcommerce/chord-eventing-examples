@@ -12,6 +12,8 @@ export const useChordIdentifiers = (cart) => {
       const attributes = [];
       const googleClientId = getCookie('_ga')?.substring(6);
       const chordCdpAnonymousId = getCookie('__eventn_id');
+      const fbc = getCookie('_fbc');
+      const fbp = getCookie('_fbp');
 
       if (chordCdpAnonymousId) {
         attributes.push({
@@ -24,6 +26,20 @@ export const useChordIdentifiers = (cart) => {
         attributes.push({
           key: '_googleClientId',
           value: googleClientId,
+        });
+      }
+
+      if (fbc) {
+        attributes.push({
+          key: '_fbc',
+          value: fbc,
+        });
+      }
+
+      if (fbp) {
+        attributes.push({
+          key: '_fbp',
+          value: fbp,
         });
       }
 
