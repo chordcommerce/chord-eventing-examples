@@ -36,12 +36,18 @@ export type CartLineFragment = Pick<
       Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
     >;
   };
+  sellingPlanAllocation?: StorefrontAPI.Maybe<{
+    sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+  }>;
 };
 
 export type CartLineComponentFragment = Pick<
   StorefrontAPI.ComponentizableCartLine,
   'id' | 'quantity'
 > & {
+  sellingPlanAllocation?: StorefrontAPI.Maybe<{
+    sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+  }>;
   attributes: Array<Pick<StorefrontAPI.Attribute, 'key' | 'value'>>;
   cost: {
     totalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
@@ -124,8 +130,14 @@ export type CartApiQueryFragment = Pick<
               Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
             >;
           };
+          sellingPlanAllocation?: StorefrontAPI.Maybe<{
+            sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+          }>;
         })
       | (Pick<StorefrontAPI.ComponentizableCartLine, 'id' | 'quantity'> & {
+          sellingPlanAllocation?: StorefrontAPI.Maybe<{
+            sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+          }>;
           attributes: Array<Pick<StorefrontAPI.Attribute, 'key' | 'value'>>;
           cost: {
             totalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
@@ -751,6 +763,44 @@ export type ProductVariantFragment = Pick<
   };
 };
 
+export type SellingPlanMoneyFragment = Pick<
+  StorefrontAPI.MoneyV2,
+  'amount' | 'currencyCode'
+>;
+
+export type SellingPlanFragment = Pick<
+  StorefrontAPI.SellingPlan,
+  'id' | 'recurringDeliveries'
+> & {
+  options: Array<Pick<StorefrontAPI.SellingPlanOption, 'name' | 'value'>>;
+  priceAdjustments: Array<
+    Pick<StorefrontAPI.SellingPlanPriceAdjustment, 'orderCount'> & {
+      adjustmentValue:
+        | ({__typename: 'SellingPlanFixedAmountPriceAdjustment'} & {
+            adjustmentAmount: Pick<
+              StorefrontAPI.MoneyV2,
+              'amount' | 'currencyCode'
+            >;
+          })
+        | ({__typename: 'SellingPlanFixedPriceAdjustment'} & {
+            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+          })
+        | ({__typename: 'SellingPlanPercentagePriceAdjustment'} & Pick<
+            StorefrontAPI.SellingPlanPercentagePriceAdjustment,
+            'adjustmentPercentage'
+          >);
+    }
+  >;
+  checkoutCharge: Pick<StorefrontAPI.SellingPlanCheckoutCharge, 'type'> & {
+    value:
+      | Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+      | Pick<
+          StorefrontAPI.SellingPlanCheckoutChargePercentageValue,
+          'percentage'
+        >;
+  };
+};
+
 export type SellingPlanGroupFragment = Pick<
   StorefrontAPI.SellingPlanGroup,
   'name'
@@ -1145,44 +1195,6 @@ export type ProductQuery = {
       };
     }
   >;
-};
-
-export type SellingPlanMoneyFragment = Pick<
-  StorefrontAPI.MoneyV2,
-  'amount' | 'currencyCode'
->;
-
-export type SellingPlanFragment = Pick<
-  StorefrontAPI.SellingPlan,
-  'id' | 'recurringDeliveries'
-> & {
-  options: Array<Pick<StorefrontAPI.SellingPlanOption, 'name' | 'value'>>;
-  priceAdjustments: Array<
-    Pick<StorefrontAPI.SellingPlanPriceAdjustment, 'orderCount'> & {
-      adjustmentValue:
-        | ({__typename: 'SellingPlanFixedAmountPriceAdjustment'} & {
-            adjustmentAmount: Pick<
-              StorefrontAPI.MoneyV2,
-              'amount' | 'currencyCode'
-            >;
-          })
-        | ({__typename: 'SellingPlanFixedPriceAdjustment'} & {
-            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
-          })
-        | ({__typename: 'SellingPlanPercentagePriceAdjustment'} & Pick<
-            StorefrontAPI.SellingPlanPercentagePriceAdjustment,
-            'adjustmentPercentage'
-          >);
-    }
-  >;
-  checkoutCharge: Pick<StorefrontAPI.SellingPlanCheckoutCharge, 'type'> & {
-    value:
-      | Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
-      | Pick<
-          StorefrontAPI.SellingPlanCheckoutChargePercentageValue,
-          'percentage'
-        >;
-  };
 };
 
 export type SearchProductFragment = {__typename: 'Product'} & Pick<
