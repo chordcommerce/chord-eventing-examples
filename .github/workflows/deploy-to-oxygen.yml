@@ -59,8 +59,14 @@ jobs:
           echo "Checking node_modules contents:"
           ls -la node_modules/@shopify/
           echo "Attempting to install @shopify/mini-oxygen explicitly:"
-          npm install @shopify/mini-oxygen@^3.2.0
+          npm install @shopify/mini-oxygen@^3.2.0 --verbose
           echo "After explicit install:"
+          npm list @shopify/mini-oxygen
+          echo "Checking if mini-oxygen directory exists:"
+          ls -la node_modules/@shopify/ | grep mini-oxygen || echo "mini-oxygen not found"
+          echo "Trying to install with --force:"
+          npm install @shopify/mini-oxygen@^3.2.0 --force
+          echo "After force install:"
           npm list @shopify/mini-oxygen
 
       - name: Build project
