@@ -59,7 +59,7 @@ jobs:
         working-directory: ./hydrogen-quickstart
         env:
           NODE_OPTIONS: "--no-experimental-fetch"
-        run: npm run build
+        run: npx shopify hydrogen build --codegen
 
   deploy:
     needs: test
