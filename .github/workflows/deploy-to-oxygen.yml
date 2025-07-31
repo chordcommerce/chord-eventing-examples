@@ -4,16 +4,20 @@ on:
   push:
     branches: [main, master]
     paths:
-      - 'hydrogen-quickstart/**'
+      - "hydrogen-quickstart/**"
   pull_request:
     branches: [main, master]
     paths:
-      - 'hydrogen-quickstart/**'
+      - "hydrogen-quickstart/**"
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--no-experimental-fetch"
+      UNDICI_NO_FETCH: "1"
+      NODE_ENV: "production"
 
     steps:
       - name: Checkout code
@@ -22,41 +26,91 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "20"
 
       - name: Install dependencies
         working-directory: ./hydrogen-quickstart
+        env:
+          NODE_OPTIONS: "--no-experimental-fetch"
         run: |
           # Remove existing node_modules and package-lock.json as suggested by the error
           rm -rf node_modules package-lock.json
           # Clear npm cache to avoid optional dependencies issues
           npm cache clean --force
           # Install dependencies fresh
-          npm install
+          npm install --legacy-peer-deps
           # Explicitly install Rollup binary for Linux
           npm install @rollup/rollup-linux-x64-gnu
+
+      - name: Install mini-oxygen explicitly
+        working-directory: ./hydrogen-quickstart
+        env:
+          NODE_OPTIONS: "--no-experimental-fetch"
+        run: |
+          echo "Checking package.json for mini-oxygen:"
+          cat package.json | grep -A 5 -B 5 mini-oxygen
+          echo "Checking if mini-oxygen is already in package-lock.json:"
+          grep -r "mini-oxygen" package-lock.json || echo "Not found in package-lock.json"
+          echo "Trying to install mini-oxygen with exact version:"
+          npm install @shopify/mini-oxygen@3.2.0 --save-dev --legacy-peer-deps
+          echo "Verifying mini-oxygen installation:"
+          npm list @shopify/mini-oxygen
 
       - name: Run linting (optional)
         working-directory: ./hydrogen-quickstart
         run: npm run lint || true
         continue-on-error: true
 
+      - name: Check @shopify/mini-oxygen version
+        working-directory: ./hydrogen-quickstart
+        run: |
+          echo "Installed @shopify/mini-oxygen version:"
+          npm list @shopify/mini-oxygen || echo "Package not found or installation issue"
+          echo "Checking if package.json contains @shopify/mini-oxygen:"
+          grep "@shopify/mini-oxygen" package.json || echo "Package not found in package.json"
+          echo "Checking @shopify directory contents:"
+          ls -la node_modules/@shopify/ || echo "No @shopify directory found"
+          echo "Checking node_modules contents:"
+          ls -la node_modules/@shopify/
+          echo "Attempting to install @shopify/mini-oxygen explicitly:"
+          npm install @shopify/mini-oxygen@^3.2.0 --verbose
+          echo "After explicit install:"
+          npm list @shopify/mini-oxygen
+          echo "Checking if mini-oxygen directory exists:"
+          ls -la node_modules/@shopify/ | grep mini-oxygen || echo "mini-oxygen not found"
+          echo "Trying to install with --force:"
+          npm install @shopify/mini-oxygen@^3.2.0 --force
+          echo "After force install:"
+          npm list @shopify/mini-oxygen
+          echo "Trying with clean install:"
+          rm -rf node_modules/@shopify/mini-oxygen
+          npm cache clean --force
+          npm install @shopify/mini-oxygen@^3.2.0
+          echo "After clean install:"
+          npm list @shopify/mini-oxygen
+
       - name: Build project
         working-directory: ./hydrogen-quickstart
-        run: npm run build
+        env:
+          NODE_OPTIONS: "--no-experimental-fetch"
+        run: npx shopify hydrogen build --codegen
 
   deploy:
     needs: test
     name: Deploy to Oxygen
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--no-experimental-fetch"
+      UNDICI_NO_FETCH: "1"
+      NODE_ENV: "production"
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: "20"
           check-latest: true
 
       - name: Cache node modules
@@ -74,6 +128,8 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./hydrogen-quickstart
+        env:
+          NODE_OPTIONS: "--no-experimental-fetch"
         run: |
           # Remove existing node_modules and package-lock.json as suggested by the error
           rm -rf node_modules package-lock.json
@@ -86,6 +142,7 @@ jobs:
 
       - name: Build and Publish to Oxygen
         working-directory: ./hydrogen-quickstart
-        run: npx shopify hydrogen deploy --force
         env:
+          NODE_OPTIONS: "--no-experimental-fetch"
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000038565 }}
+        run: npx shopify hydrogen deploy --force
