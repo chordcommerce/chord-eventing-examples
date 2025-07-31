@@ -38,9 +38,23 @@ jobs:
           # Clear npm cache to avoid optional dependencies issues
           npm cache clean --force
           # Install dependencies fresh
-          npm install
+          npm install --legacy-peer-deps
           # Explicitly install Rollup binary for Linux
           npm install @rollup/rollup-linux-x64-gnu
+
+      - name: Install mini-oxygen explicitly
+        working-directory: ./hydrogen-quickstart
+        env:
+          NODE_OPTIONS: "--no-experimental-fetch"
+        run: |
+          echo "Checking package.json for mini-oxygen:"
+          cat package.json | grep -A 5 -B 5 mini-oxygen
+          echo "Checking if mini-oxygen is already in package-lock.json:"
+          grep -r "mini-oxygen" package-lock.json || echo "Not found in package-lock.json"
+          echo "Trying to install mini-oxygen with exact version:"
+          npm install @shopify/mini-oxygen@3.2.0 --save-dev --legacy-peer-deps
+          echo "Verifying mini-oxygen installation:"
+          npm list @shopify/mini-oxygen
 
       - name: Run linting (optional)
         working-directory: ./hydrogen-quickstart
@@ -67,6 +81,12 @@ jobs:
           echo "Trying to install with --force:"
           npm install @shopify/mini-oxygen@^3.2.0 --force
           echo "After force install:"
+          npm list @shopify/mini-oxygen
+          echo "Trying with clean install:"
+          rm -rf node_modules/@shopify/mini-oxygen
+          npm cache clean --force
+          npm install @shopify/mini-oxygen@^3.2.0
+          echo "After clean install:"
           npm list @shopify/mini-oxygen
 
       - name: Build project
