@@ -4,11 +4,11 @@ on:
   push:
     branches: [main, master]
     paths:
-      - 'hydrogen-quickstart/**'
+      - "hydrogen-quickstart/**"
   pull_request:
     branches: [main, master]
     paths:
-      - 'hydrogen-quickstart/**'
+      - "hydrogen-quickstart/**"
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
         working-directory: ./hydrogen-quickstart
@@ -43,6 +43,8 @@ jobs:
 
       - name: Build project
         working-directory: ./hydrogen-quickstart
+        env:
+          NODE_OPTIONS: "--no-experimental-fetch"
         run: npm run build
 
   deploy:
@@ -56,7 +58,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
           check-latest: true
 
       - name: Cache node modules
@@ -86,6 +88,7 @@ jobs:
 
       - name: Build and Publish to Oxygen
         working-directory: ./hydrogen-quickstart
-        run: npx shopify hydrogen deploy --force
         env:
+          NODE_OPTIONS: "--no-experimental-fetch"
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000038565 }}
+        run: npx shopify hydrogen deploy --force
