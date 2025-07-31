@@ -54,6 +54,14 @@ jobs:
           npm list @shopify/mini-oxygen || echo "Package not found or installation issue"
           echo "Checking if package.json contains @shopify/mini-oxygen:"
           grep "@shopify/mini-oxygen" package.json || echo "Package not found in package.json"
+          echo "Checking @shopify directory contents:"
+          ls -la node_modules/@shopify/ || echo "No @shopify directory found"
+          echo "Checking node_modules contents:"
+          ls -la node_modules/ | head -20
+          echo "Attempting to install @shopify/mini-oxygen explicitly:"
+          npm install @shopify/mini-oxygen@^3.2.1
+          echo "After explicit install:"
+          npm list @shopify/mini-oxygen
 
       - name: Build project
         working-directory: ./hydrogen-quickstart
