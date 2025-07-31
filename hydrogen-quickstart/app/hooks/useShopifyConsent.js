@@ -7,6 +7,7 @@ function useShopifyConsent() {
       const Shopify = window.Shopify?.customerPrivacy;
       if (!Shopify) return;
 
+      console.log('Shopify', Shopify);
       console.log({
         analytics: Shopify.analyticsProcessingAllowed(),
         marketing: Shopify.marketingAllowed(),
