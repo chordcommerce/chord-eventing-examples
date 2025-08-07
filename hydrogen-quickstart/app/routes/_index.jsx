@@ -2,6 +2,7 @@ import {Await, useLoaderData, Link} from 'react-router';
 import {Suspense} from 'react';
 import {Image} from '@shopify/hydrogen';
 import {ProductItem} from '~/components/ProductItem';
+import {Experiment} from '~/components/Experiment';
 
 /**
  * @type {MetaFunction}
@@ -64,6 +65,22 @@ export default function Homepage() {
   const data = useLoaderData();
   return (
     <div className="home">
+      <Experiment
+        variantA={{
+          content: <div>Variant A</div>,
+          customData: {
+            experimentId: 'experiment_1',
+            variant: 'A',
+          },
+        }}
+        variantB={{
+          content: <div>Variant B</div>,
+          customData: {
+            experimentId: 'experiment_1',
+            variant: 'B',
+          },
+        }}
+      />
       <FeaturedCollection collection={data.featuredCollection} />
       <RecommendedProducts products={data.recommendedProducts} />
     </div>
