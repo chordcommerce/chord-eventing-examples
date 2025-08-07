@@ -175,6 +175,15 @@ export function ChordAnalytics({
         },
       });
     });
+
+    subscribe('custom_experiment_viewed', (data = {}) => {
+      const {customData} = data;
+
+      chord.track('Experiment Viewed', {
+        experimentId: customData?.experimentId,
+        variant: customData?.variant,
+      });
+    });
   }, []);
 
   return null;
