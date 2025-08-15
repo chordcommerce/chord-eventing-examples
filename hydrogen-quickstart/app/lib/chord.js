@@ -18,6 +18,7 @@ const productFormatter = ({position, product, quantity, variantId}) => {
     slug: product?.handle,
     variant: product?.variantTitle,
     variant_id: parseGid(variantId)?.id || undefined,
+    image_url: product?.image,
   };
 };
 
