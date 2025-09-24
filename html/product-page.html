@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      async
+      src="https://staging.cdp.ingest.chord.co/p.js"
+      data-write-key="LEb8siYqL8xX2MVhQWGrueuTZKn8BgL0:ZYFA80XAfGnUdt1EuyorJp83YnFW3nHb"
+      data-init-only="true"
+      data-namespace="_chord"
+    ></script>
+
+    <script src="./chord.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const cdpReadyPromise = _waitForChordCdpReady();
+        await cdpReadyPromise;
+        _chordPage();
+
+        _chordTrack("Product Viewed", {
+          productId: "123",
+          productName: "Product Name",
+          productPrice: 100,
+          productQuantity: 1,
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <h1>Product Page</h1>
+  </body>
+</html>

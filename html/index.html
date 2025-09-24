@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      async
+      src="https://staging.cdp.ingest.chord.co/p.js"
+      data-write-key="LEb8siYqL8xX2MVhQWGrueuTZKn8BgL0:ZYFA80XAfGnUdt1EuyorJp83YnFW3nHb"
+      data-init-only="true"
+      data-namespace="_chord"
+    ></script>
+
+    <script src="./chord.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const cdpReadyPromise = _waitForChordCdpReady();
+        await cdpReadyPromise;
+
+        const addToCartButton = document.querySelector(".js-add-to-cart");
+        const cartViewedButton = document.querySelector(".js-cart-viewed");
+        const checkoutStartedButton = document.querySelector(
+          ".js-checkout-started"
+        );
+        const orderCompletedButton = document.querySelector(
+          ".js-order-completed"
+        );
+
+        _chordPage();
+
+        addToCartButton.addEventListener("click", () => {
+          _chordTrack("Product Added", {
+            productId: "123",
+            productName: "Product Name",
+            productPrice: 100,
+            productQuantity: 1,
+            ...pageProps,
+          });
+        });
+        cartViewedButton.addEventListener("click", () => {
+          _chordTrack("Cart Viewed", {
+            cartId: "123",
+          });
+        });
+        checkoutStartedButton.addEventListener("click", () => {
+          _chordTrack("Checkout Started", {
+            checkoutId: "123",
+          });
+        });
+        orderCompletedButton.addEventListener("click", () => {
+          window._chord.track("Order Completed", {
+            orderId: "123",
+          });
+        });
+      });
+    </script>
+
+    <title>Document</title>
+  </head>
+  <body>
+    <button class="js-add-to-cart">track add to cart</button>
+    <button class="js-cart-viewed">track cart viewed</button>
+    <button class="js-checkout-started">track checkout started</button>
+    <button class="js-order-completed">track order completed</button>
+
+    <a href="./product-page.html">go to product page</a>
+  </body>
+</html>
