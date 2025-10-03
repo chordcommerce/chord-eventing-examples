@@ -14,6 +14,9 @@ export const useChordIdentifiers = (cart) => {
       const chordCdpAnonymousId = getCookie('__eventn_id');
       const fbc = getCookie('_fbc');
       const fbp = getCookie('_fbp');
+      const awinAWCFromSnCookie = getCookie('_aw_sn_') || '';
+      const awinAWCFromCookie = getCookie('_aw_m_') || '';
+      const awinChannel = getCookie('_aw_channel') || '';
 
       if (chordCdpAnonymousId) {
         attributes.push({
@@ -40,6 +43,30 @@ export const useChordIdentifiers = (cart) => {
         attributes.push({
           key: '_fbp',
           value: fbp,
+        });
+      }
+
+      if (awinAWCFromCookie.length > 0 && awinAWCFromSnCookie.length > 0) {
+        attributes.push({
+          key: '__awc',
+          value: awinAWCFromCookie + ',' + awinAWCFromSnCookie,
+        });
+      } else if (awinAWCFromCookie.length > 0) {
+        attributes.push({
+          key: '__awc',
+          value: awinAWCFromCookie,
+        });
+      } else if (awinAWCFromSnCookie.length > 0) {
+        attributes.push({
+          key: '__awc',
+          value: awinAWCFromSnCookie,
+        });
+      }
+
+      if (awinChannel) {
+        attributes.push({
+          key: '__awin_channel',
+          value: awinChannel,
         });
       }
 
