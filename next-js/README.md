@@ -1,36 +1,168 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+This project demonstrates how to integrate the **@chordcommerce/analytics** package for tracking e-commerce events in a Next.js application.
 
-First, run the development server:
+## Chord Analytics Integration
+
+### Installation
+
+Install the @chordcommerce/analytics package:
 
 ```bash
-npm run dev
+npm install @chordcommerce/analytics
 # or
-yarn dev
+yarn add @chordcommerce/analytics
 # or
-pnpm dev
-# or
-bun dev
+pnpm add @chordcommerce/analytics
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file in the root directory with the following variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Required
+NEXT_PUBLIC_CHORD_CDP_DOMAIN="https://staging.cdp.ingest.chord.co"
+NEXT_PUBLIC_CHORD_CDP_WRITE_KEY="your-write-key-here"
 
-## Learn More
+# Optional
+NEXT_PUBLIC_CHORD_OMS_ID=""
+NEXT_PUBLIC_CHORD_STORE_ID=""
+NEXT_PUBLIC_CHORD_TENANT_ID=""
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Basic Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### 1. Initialize the Analytics Client
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Create a client initialization file (e.g., `app/lib/chord/analytics-client.ts`):
 
-## Deploy on Vercel
+```typescript
+import { ChordAnalytics } from "@chordcommerce/analytics";
+import type { ChordAnalyticsOptions } from "@chordcommerce/analytics";
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+export const createChordClient = (
+  currency: string,
+  locale: string
+): ChordAnalytics => {
+  const options: ChordAnalyticsOptions = {
+    cdpDomain: process.env.NEXT_PUBLIC_CHORD_CDP_DOMAIN,
+    cdpWriteKey: process.env.NEXT_PUBLIC_CHORD_CDP_WRITE_KEY,
+    formatters: {
+      objects: {
+        // Add custom formatters for your data types
+      },
+    },
+    metadata: {
+      i18n: {
+        currency,
+        locale,
+      },
+      ownership: {
+        omsId: process.env.NEXT_PUBLIC_CHORD_OMS_ID || "",
+        storeId: process.env.NEXT_PUBLIC_CHORD_STORE_ID || "",
+        tenantId: process.env.NEXT_PUBLIC_CHORD_TENANT_ID || "",
+      },
+      platform: {
+        name: "chord",
+        type: "web",
+      },
+      store: {
+        domain: "https://example.com",
+      },
+    },
+  };
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  return new ChordAnalytics(options);
+};
+```
+
+#### 2. Create the Analytics Hook
+
+Create a custom hook to access the analytics client (e.g., `app/hooks/useChord.ts`):
+
+```typescript
+"use client";
+
+import { createContext, useContext } from "react";
+import type { ChordAnalytics } from "@chordcommerce/analytics";
+
+export const ChordAnalyticsContext = createContext<ChordAnalytics>(undefined!);
+ChordAnalyticsContext.displayName = "ChordAnalyticsContext";
+
+export function useChord() {
+  return useContext(ChordAnalyticsContext);
+}
+```
+
+#### 3. Set Up React Context Provider
+
+Wrap your application with the Chord Analytics provider (e.g., `app/contexts/chord-context.tsx`):
+
+```typescript
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { ChordAnalyticsContext } from "../hooks/useChord";
+import { createChordClient } from "../lib/chord";
+
+export const ChordProvider = ({ children }: { children: React.ReactNode }) => {
+  const currency = "USD";
+  const locale = "en-US";
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const chord = useMemo(() => {
+    if (!isClient) return null;
+    return createChordClient(currency, locale);
+  }, [isClient, currency, locale]);
+
+  if (!chord) {
+    return <>{children}</>;
+  }
+
+  return (
+    <ChordAnalyticsContext.Provider value={chord}>
+      {children}
+    </ChordAnalyticsContext.Provider>
+  );
+};
+```
+
+#### 4. Use the Analytics Hook in Components
+
+Access the analytics client in your components:
+
+```typescript
+import { useChord } from '../hooks/useChord'
+
+export function ProductPage({ product }) {
+  const chord = useChord()
+
+  useEffect(() => {
+    if (chord && product) {
+      chord.trackProductViewed({
+        product: {
+          product: {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            sku: product.sku,
+            brand: product.brand,
+          },
+          quantity: 1,
+          variantId: product.sku,
+        },
+        cart: {},
+      })
+    }
+  }, [chord, product])
+
+  return (
+    // Your component JSX
+  )
+}
+```
