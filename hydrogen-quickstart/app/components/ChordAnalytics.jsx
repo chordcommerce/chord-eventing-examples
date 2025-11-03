@@ -1,7 +1,8 @@
 import {parseGid, useAnalytics} from '@shopify/hydrogen';
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {createChordClient} from '../lib/chord';
 import {getCookie} from '../lib/utils';
+import {useScrollTrackerAnalytics} from '../hooks/useScrollTrackerAnalytics';
 
 export function ChordAnalytics({
   currency,
@@ -28,6 +29,10 @@ export function ChordAnalytics({
     });
   }, []);
 
+  useScrollTrackerAnalytics();
+
+  const scrollRef = useRef(false);
+
   const googleClientId = getCookie('_ga')?.substring(6);
 
   useEffect(() => {
@@ -35,6 +40,7 @@ export function ChordAnalytics({
       chord.page({
         googleClientId,
       });
+      scrollRef.current = false;
     });
 
     subscribe('cart_updated', (data) => {
@@ -182,6 +188,25 @@ export function ChordAnalytics({
       chord.track('Experiment Viewed', {
         experimentId: customData?.experimentId,
         variant: customData?.variant,
+      });
+    });
+
+    subscribe('custom_track_scroll', () => {
+      const scrollPercent = Math.round(
+        ((document.documentElement.scrollTop || document.body.scrollTop) /
+          (document.documentElement.scrollHeight -
+            document.documentElement.clientHeight)) *
+          100,
+      );
+
+      const thresholds = [25, 50, 75, 90];
+
+      thresholds.forEach((threshold) => {
+        if (scrollPercent >= threshold && !scrollRef.current) {
+          chord?.track('Scroll', {
+            scrollPercent: threshold,
+          });
+        }
       });
     });
   }, []);
