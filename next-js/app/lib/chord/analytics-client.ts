@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { ChordAnalytics } from '@chordcommerce/analytics'
+import { ChordAnalytics } from "@chordcommerce/analytics";
 
-import cartFormatter from './formatters/cart'
-import checkoutFormatter from './formatters/checkout'
-import lineItemFormatter from './formatters/line-item-formatter'
-import productFormatter from './formatters/product'
+import cartFormatter from "./formatters/cart";
+import checkoutFormatter from "./formatters/checkout";
+import lineItemFormatter from "./formatters/line-item-formatter";
+import productFormatter from "./formatters/product";
 
-import type { AnalyticsChordInputs } from './analytics-types'
-import type { ChordAnalyticsOptions } from '@chordcommerce/analytics'
+import type { AnalyticsChordInputs } from "./analytics-types";
+import type { ChordAnalyticsOptions } from "@chordcommerce/analytics";
 
 export const createChordOptions = (
   currency: string,
@@ -16,6 +16,9 @@ export const createChordOptions = (
 ): ChordAnalyticsOptions => ({
   cdpDomain: process.env.NEXT_PUBLIC_CHORD_CDP_DOMAIN,
   cdpWriteKey: process.env.NEXT_PUBLIC_CHORD_CDP_WRITE_KEY,
+
+  debug: true,
+  enableLogging: true,
   formatters: {
     objects: {
       cart: cartFormatter,
@@ -30,24 +33,24 @@ export const createChordOptions = (
       locale,
     },
     ownership: {
-      omsId: process.env.NEXT_PUBLIC_CHORD_OMS_ID || '',
-      storeId: process.env.NEXT_PUBLIC_CHORD_STORE_ID || '',
-      tenantId: process.env.NEXT_PUBLIC_CHORD_TENANT_ID || '',
+      omsId: process.env.NEXT_PUBLIC_CHORD_OMS_ID || "",
+      storeId: process.env.NEXT_PUBLIC_CHORD_STORE_ID || "",
+      tenantId: process.env.NEXT_PUBLIC_CHORD_TENANT_ID || "",
     },
     platform: {
-      name: 'chord',
-      type: 'web',
+      name: "chord",
+      type: "web",
     },
     store: {
-      domain: 'https://example.com',
+      domain: "https://example.com",
     },
   },
-})
+});
 
 export const createChordClient = (
   currency: string,
   locale: string
 ): ChordAnalytics<AnalyticsChordInputs> => {
-  const options = createChordOptions(currency, locale)
-  return new ChordAnalytics<AnalyticsChordInputs>(options)
-}
+  const options = createChordOptions(currency, locale);
+  return new ChordAnalytics<AnalyticsChordInputs>(options);
+};
