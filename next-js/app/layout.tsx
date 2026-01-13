@@ -4,6 +4,7 @@ import { ChordProvider } from './contexts/chord-context'
 import { AnalyticsLayout } from './components/analytics-layout'
 import { CartProvider } from './contexts/cart-context'
 import { CartButton } from './components/cart-button'
+import { Navigation } from './components/navigation'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -21,6 +22,7 @@ export default function RootLayout({
         <ChordProvider>
           <CartProvider>
             <AnalyticsLayout>
+              <Navigation />
               {children}
               <CartButton />
             </AnalyticsLayout>
