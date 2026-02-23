@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import './globals.css'
 import { ChordProvider } from './contexts/chord-context'
 import { AnalyticsLayout } from './components/analytics-layout'
@@ -18,6 +19,82 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          id="onetrust-mock"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var params = new URLSearchParams(window.location.search);
+                var delay = parseInt(params.get("oneTrustDelay") || "0", 10) || 0;
+                var consentChangedCallback = null;
+
+                // OneTrust API object is always available immediately
+                window.OneTrust = {
+                  GetDomainData: function() {
+                    return {
+                      Groups: [
+                        { CustomGroupId: "C0001", GroupName: "Strictly Necessary" },
+                        { CustomGroupId: "C0002", GroupName: "Performance" },
+                        { CustomGroupId: "C0003", GroupName: "Functional" }
+                      ],
+                      ConsentModel: { Name: "opt-out" }
+                    };
+                  },
+                  OnConsentChanged: function(callback) {
+                    consentChangedCallback = callback;
+                    console.log("[OneTrust Mock] OnConsentChanged handler registered");
+                  },
+                  IsAlertBoxClosed: function() {
+                    return true;
+                  }
+                };
+
+                function populateGroups() {
+                  window.OnetrustActiveGroups = ",C0001,C0002,C0003,";
+                  console.log("[OneTrust Mock] Active groups populated:", window.OnetrustActiveGroups);
+                  if (consentChangedCallback) {
+                    consentChangedCallback();
+                    console.log("[OneTrust Mock] Fired OnConsentChanged callback");
+                  }
+                }
+
+                if (delay > 0) {
+                  console.log("[OneTrust Mock] API ready. Delaying active groups by " + delay + "ms (use ?oneTrustDelay=0 for instant)");
+                  setTimeout(populateGroups, delay);
+                } else {
+                  populateGroups();
+                  console.log("[OneTrust Mock] Initialized instantly (use ?oneTrustDelay=3000 to simulate slow init)");
+                }
+
+                // Helper to simulate toggling consent in the browser console
+                window.__mockOneTrustToggle = function(groupId) {
+                  var groups = window.OnetrustActiveGroups;
+                  if (!groups) {
+                    console.log("[OneTrust Mock] Active groups not yet populated");
+                    return;
+                  }
+                  if (groups.indexOf(groupId) !== -1) {
+                    groups = groups.replace(groupId + ",", "");
+                    console.log("[OneTrust Mock] Removed consent group:", groupId);
+                  } else {
+                    groups = groups.slice(0, -1) + groupId + ",";
+                    console.log("[OneTrust Mock] Added consent group:", groupId);
+                  }
+                  window.OnetrustActiveGroups = groups;
+                  console.log("[OneTrust Mock] OnetrustActiveGroups:", groups);
+
+                  if (consentChangedCallback) {
+                    consentChangedCallback();
+                    console.log("[OneTrust Mock] Fired OnConsentChanged callback");
+                  }
+                };
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <ChordProvider>
           <CartProvider>
