@@ -4,6 +4,11 @@ import {createChordClient} from '../lib/chord';
 import {getCookie} from '../lib/utils';
 import {useScrollTrackerAnalytics} from '../hooks/useScrollTrackerAnalytics';
 
+// Module-level flag to prevent duplicate Shopify analytics subscriptions.
+// Shopify's subscribe() returns void (no unsubscribe handle), so React
+// StrictMode's unmount/remount cycle registers handlers twice without this.
+let subscribed = false;
+
 export function ChordAnalytics({
   currency,
   domain,
@@ -29,13 +34,16 @@ export function ChordAnalytics({
     });
   }, []);
 
-  useScrollTrackerAnalytics();
+  // useScrollTrackerAnalytics();
 
   const scrollRef = useRef(false);
 
   const googleClientId = getCookie('_ga')?.substring(6);
 
   useEffect(() => {
+    if (subscribed) return;
+    subscribed = true;
+
     subscribe('page_viewed', () => {
       chord.page({
         googleClientId,
@@ -182,33 +190,31 @@ export function ChordAnalytics({
       });
     });
 
-    subscribe('custom_experiment_viewed', (data = {}) => {
-      const {customData} = data;
-
-      chord.track('Experiment Viewed', {
-        experimentId: customData?.experimentId,
-        variant: customData?.variant,
-      });
-    });
-
-    subscribe('custom_track_scroll', () => {
-      const scrollPercent = Math.round(
-        ((document.documentElement.scrollTop || document.body.scrollTop) /
-          (document.documentElement.scrollHeight -
-            document.documentElement.clientHeight)) *
-          100,
-      );
-
-      const thresholds = [25, 50, 75, 90];
-
-      thresholds.forEach((threshold) => {
-        if (scrollPercent >= threshold && !scrollRef.current) {
-          chord?.track('Scroll', {
-            scrollPercent: threshold,
-          });
-        }
-      });
-    });
+    // Disabled — these add noise and most customers don't use them.
+    // Uncomment to re-enable experiment and scroll tracking.
+    //
+    // subscribe('custom_experiment_viewed', (data = {}) => {
+    //   const {customData} = data;
+    //   chord.track('Experiment Viewed', {
+    //     experimentId: customData?.experimentId,
+    //     variant: customData?.variant,
+    //   });
+    // });
+    //
+    // subscribe('custom_track_scroll', () => {
+    //   const scrollPercent = Math.round(
+    //     ((document.documentElement.scrollTop || document.body.scrollTop) /
+    //       (document.documentElement.scrollHeight -
+    //         document.documentElement.clientHeight)) *
+    //           100,
+    //   );
+    //   const thresholds = [25, 50, 75, 90];
+    //   thresholds.forEach((threshold) => {
+    //     if (scrollPercent >= threshold && !scrollRef.current) {
+    //       chord?.track('Scroll', { scrollPercent: threshold });
+    //     }
+    //   });
+    // });
   }, []);
 
   return null;
