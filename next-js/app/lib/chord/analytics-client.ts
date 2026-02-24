@@ -16,7 +16,8 @@ export const createChordOptions = (
 ): ChordAnalyticsOptions => ({
   cdpDomain: process.env.NEXT_PUBLIC_CHORD_CDP_DOMAIN,
   cdpWriteKey: process.env.NEXT_PUBLIC_CHORD_CDP_WRITE_KEY,
-
+  consent: 'onetrust',
+  awaitConsent: true,
   debug: true,
   enableLogging: true,
   formatters: {

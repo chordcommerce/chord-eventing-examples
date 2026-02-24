@@ -18,7 +18,7 @@ pnpm add @chordcommerce/analytics
 
 ### Environment Setup
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env.local` file in this directory with the following variables:
 
 ```bash
 # Required
@@ -30,6 +30,14 @@ NEXT_PUBLIC_CHORD_OMS_ID=""
 NEXT_PUBLIC_CHORD_STORE_ID=""
 NEXT_PUBLIC_CHORD_TENANT_ID=""
 ```
+
+These `NEXT_PUBLIC_*` variables are inlined into the client bundle at compile time. If you change their values, restart the dev server with a clean cache:
+
+```bash
+rm -rf .next && npm run dev
+```
+
+> **Note:** If you use [direnv](https://direnv.net/) instead of `.env.local`, make sure the variables are `export`ed in your `.envrc` — a plain assignment without `export` will not make them available to Next.js.
 
 ### Basic Usage
 

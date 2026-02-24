@@ -1,7 +1,7 @@
-import {defineConfig} from 'vite';
-import {hydrogen} from '@shopify/hydrogen/vite';
-import {oxygen} from '@shopify/mini-oxygen/vite';
-import {reactRouter} from '@react-router/dev/vite';
+import { defineConfig } from 'vite';
+import { hydrogen } from '@shopify/hydrogen/vite';
+import { oxygen } from '@shopify/mini-oxygen/vite';
+import { reactRouter } from '@react-router/dev/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
@@ -24,6 +24,13 @@ export default defineConfig({
        * @see https://vitejs.dev/config/dep-optimization-options
        */
       include: ['react-router', 'react-router-dom'],
+    },
+  },
+  server: {
+    allowedHosts: true,
+    cors: {
+      origin: '*',
+      credentials: true,
     },
   },
 });
