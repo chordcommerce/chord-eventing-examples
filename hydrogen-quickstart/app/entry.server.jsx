@@ -56,6 +56,7 @@ export default async function handleRequest(
       'https://t.getletterpress.com', // Letterpress/Postie
       'https://insight.adsrvr.org', // The Trade Desk
       'https://s.yimg.com', // Yahoo Pixel
+      'https://monorail-edge.shopifysvc.com', // Shopify analytics
     ],
     frameSrc: [
       'https://www.googletagmanager.com',
