@@ -15,6 +15,18 @@ export default {
    */
   async fetch(request, env, executionContext) {
     try {
+      // In dev, Vite's SSR proxy rewrites the Host header to its internal address
+      // (e.g. 127.0.0.1:<ephemeral-port>), breaking React Router's CSRF check which
+      // compares Host/X-Forwarded-Host against the Origin header.
+      // Set X-Forwarded-Host from the Origin so the values match.
+      // In production (Oxygen), X-Forwarded-Host is set by Shopify's CDN and this is skipped.
+      const originHeader = request.headers.get('origin');
+      if (originHeader && !request.headers.get('x-forwarded-host')) {
+        const headers = new Headers(request.headers);
+        headers.set('X-Forwarded-Host', new URL(originHeader).host);
+        request = new Request(request, {headers});
+      }
+
       const appLoadContext = await createAppLoadContext(
         request,
         env,
